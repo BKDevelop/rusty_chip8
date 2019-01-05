@@ -1,0 +1,7 @@
+[package]
+name = "rusty_CHIP8"
+version = "0.1.0"
+authors = ["Benjamin Köhler <benjaminkoehler89@gmail.com>"]
+edition = "2018"
+
+[dependencies]
