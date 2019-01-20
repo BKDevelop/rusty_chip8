@@ -14,7 +14,6 @@
 mod memory;
 mod stack;
 pub struct Cpu {
-    opcode: u16,
     mem: memory::Memory,
     stack: stack::Stack,
     index_register: u16,
@@ -28,7 +27,6 @@ pub struct Cpu {
 impl Cpu {
     pub fn new() -> Cpu {
         Cpu {
-            opcode: 0,
             mem: memory::Memory::new(),
             stack: stack::Stack::new(),
             index_register: 0,
@@ -79,28 +77,85 @@ impl Cpu {
         // 0x??Y?
         let y = ((opcode & 0x00F0) >> 4) as u8;
 
+        // see opcode table https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
         self.program_counter = match pins {
             (0x0, 0x0, 0xE, 0x0) => panic!("opcode {} not implemented yet", opcode),
-            (0x0, 0x0, 0xE, 0xE) => panic!("opcode {} not implemented yet", opcode),
-            (0x1, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x2, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x3, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x4, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x5, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x6, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x7, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x8, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0x9, _, _, _) => panic!("opcode {} not implemented yet", opcode),
+            (0x0, 0x0, 0xE, 0xE) => self.stack.pop(),
+            (0x1, _, _, _) => nnn,
+            (0x2, _, _, _) => {
+                self.stack.push(self.program_counter);
+                nnn
+            }
+            (0x3, _, _, _) => {
+                if self.cpu_register[x as usize] == nn {
+                    self.skip_next_opcode()
+                } else {
+                    self.next_opcode()
+                }
+            }
+            (0x4, _, _, _) => {
+                if self.cpu_register[x as usize] != nn {
+                    self.skip_next_opcode()
+                } else {
+                    self.next_opcode()
+                }
+            }
+            (0x5, _, _, _) => {
+                if self.cpu_register[x as usize] == self.cpu_register[y as usize] {
+                    self.skip_next_opcode()
+                } else {
+                    self.next_opcode()
+                }
+            }
+            (0x6, _, _, _) => {
+                self.cpu_register[x as usize] = nn;
+                self.next_opcode()
+            }
+            (0x7, _, _, _) => {
+                self.cpu_register[x as usize] += nn;
+                self.next_opcode()
+            }
+            (0x8, _, _, 0x0) => {
+                self.cpu_register[x as usize] = self.cpu_register[y as usize];
+                self.next_opcode()
+            }
+            (0x8, _, _, 0x1) => {
+                self.cpu_register[x as usize] = self.cpu_register[x as usize] | self.cpu_register[y as usize];
+                self.next_opcode()
+            }
+            (0x8, _, _, 0x2) => {
+                self.cpu_register[x as usize] = self.cpu_register[x as usize] & self.cpu_register[y as usize];
+                self.next_opcode()
+            }
+            (0x8, _, _, 0x3) => panic!("opcode {} not implemented yet", opcode),
+            (0x8, _, _, 0x4) => {
+                self.cpu_register[x as usize] += self.cpu_register[y as usize];
+                self.next_opcode()
+            }
+            (0x8, _, _, 0x5) => {
+                self.cpu_register[x as usize] -= self.cpu_register[y as usize];
+                self.next_opcode()
+            }
+
+            (0x8, _, _, 0x6) => panic!("opcode {} not implemented yet", opcode),
+            (0x8, _, _, 0x7) => {
+                self.cpu_register[x as usize] = self.cpu_register[y as usize] - self.cpu_register[x as usize];
+                self.next_opcode()
+            }
+            (0x8, _, _, 0xE) => panic!("opcode {} not implemented yet", opcode),
+            (0x9, _, _, 0x0) => {
+                if self.cpu_register[x as usize] != self.cpu_register[y as usize] {
+                    self.skip_next_opcode()
+                } else {
+                    self.next_opcode()
+                }
+            }
             (0xA, _, _, _) => {
                 self.index_register = nnn;
                 self.next_opcode()
             }
             (0xB, _, _, _) => (self.cpu_register[0] as u16) + nnn,
-            (0xC, _, _, _) => {
-                let register_number = ((opcode & 0x0F00) >> 8) as u8;
-                self.cpu_register[register_number as usize] = (opcode & 0x00FF) as u8;
-                self.next_opcode()
-            }
+            (0xC, _, _, _) => panic!("opcode {} not implemented yet", opcode),
             (0xD, _, _, _) => panic!("opcode {} not implemented yet", opcode),
             (0xE, _, _, _) => panic!("opcode {} not implemented yet", opcode),
             (0xF, _, _, _) => panic!("opcode {} not implemented yet", opcode),
