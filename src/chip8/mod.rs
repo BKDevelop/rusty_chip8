@@ -11,7 +11,12 @@ impl Chip8 {
         }
     }
 
-    pub fn load_game(self, game_rom: Vec<u8>) {
+
+    pub fn load_game(&mut self, game_rom: Vec<u8>) {
         self.cpu.load_game(game_rom)
+    }
+    
+    pub fn run(self) {
+        self.cpu.emulate_cycle();
     }
 }
