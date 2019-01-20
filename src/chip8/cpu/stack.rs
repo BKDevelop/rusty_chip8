@@ -11,7 +11,7 @@ impl Stack {
         }
     }
 
-    pub fn push(mut self, bytes: u16) {
+    pub fn push(&mut self, bytes: u16) {
         if self.stack_pointer < 15 {
             self.stack[self.stack_pointer as usize] = bytes;
             self.stack_pointer += 1;
@@ -21,7 +21,7 @@ impl Stack {
     }
 
 
-    pub fn pop(mut self) -> u16 {
+    pub fn pop(&mut self) -> u16 {
         if self.stack_pointer > 0 {
             let ret = self.stack[self.stack_pointer as usize];
             self.stack[self.stack_pointer as usize] = 0;

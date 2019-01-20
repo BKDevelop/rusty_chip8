@@ -41,7 +41,7 @@ impl Cpu {
         self.mem.load_game(game_rom);
     }
 
-    pub fn emulate_cycle(self) {
+    pub fn emulate_cycle(&mut self) {
         let opcode = self.read_opcode();
         self.execute_opcode(opcode);
     }
@@ -55,7 +55,7 @@ impl Cpu {
         opcode
     }
 
-    fn execute_opcode(mut self, opcode: u16) {
+    fn execute_opcode(&mut self, opcode: u16) {
         // opcode is hex number -> 0xXXXX
         // consists of 4 x 4 bit "pins"
         let pins = (
@@ -79,7 +79,7 @@ impl Cpu {
 
         // see opcode table https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
         self.program_counter = match pins {
-            (0x0, 0x0, 0xE, 0x0) => panic!("opcode {} not implemented yet", opcode),
+            (0x0, 0x0, 0xE, 0x0) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0x0, 0x0, 0xE, 0xE) => self.stack.pop(),
             (0x1, _, _, _) => nnn,
             (0x2, _, _, _) => {
@@ -127,7 +127,7 @@ impl Cpu {
                 self.cpu_register[x as usize] = self.cpu_register[x as usize] & self.cpu_register[y as usize];
                 self.next_opcode()
             }
-            (0x8, _, _, 0x3) => panic!("opcode {} not implemented yet", opcode),
+            (0x8, _, _, 0x3) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0x8, _, _, 0x4) => {
                 self.cpu_register[x as usize] += self.cpu_register[y as usize];
                 self.next_opcode()
@@ -137,12 +137,12 @@ impl Cpu {
                 self.next_opcode()
             }
 
-            (0x8, _, _, 0x6) => panic!("opcode {} not implemented yet", opcode),
+            (0x8, _, _, 0x6) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0x8, _, _, 0x7) => {
                 self.cpu_register[x as usize] = self.cpu_register[y as usize] - self.cpu_register[x as usize];
                 self.next_opcode()
             }
-            (0x8, _, _, 0xE) => panic!("opcode {} not implemented yet", opcode),
+            (0x8, _, _, 0xE) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0x9, _, _, 0x0) => {
                 if self.cpu_register[x as usize] != self.cpu_register[y as usize] {
                     self.skip_next_opcode()
@@ -155,10 +155,10 @@ impl Cpu {
                 self.next_opcode()
             }
             (0xB, _, _, _) => (self.cpu_register[0] as u16) + nnn,
-            (0xC, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0xD, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0xE, _, _, _) => panic!("opcode {} not implemented yet", opcode),
-            (0xF, _, _, _) => panic!("opcode {} not implemented yet", opcode),
+            (0xC, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0xD, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0xE, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0xF, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
             _ => panic!("unknown opcode received: {}", opcode),
         }
     }

@@ -16,7 +16,9 @@ impl Chip8 {
         self.cpu.load_game(game_rom)
     }
     
-    pub fn run(self) {
-        self.cpu.emulate_cycle();
+    pub fn run(&mut self) {
+        loop {
+            self.cpu.emulate_cycle();
+        }
     }
 }
