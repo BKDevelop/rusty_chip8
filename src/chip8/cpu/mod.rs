@@ -120,11 +120,13 @@ impl Cpu {
                 self.next_opcode()
             }
             (0x8, _, _, 0x1) => {
-                self.cpu_register[x as usize] = self.cpu_register[x as usize] | self.cpu_register[y as usize];
+                self.cpu_register[x as usize] =
+                    self.cpu_register[x as usize] | self.cpu_register[y as usize];
                 self.next_opcode()
             }
             (0x8, _, _, 0x2) => {
-                self.cpu_register[x as usize] = self.cpu_register[x as usize] & self.cpu_register[y as usize];
+                self.cpu_register[x as usize] =
+                    self.cpu_register[x as usize] & self.cpu_register[y as usize];
                 self.next_opcode()
             }
             (0x8, _, _, 0x3) => panic!("opcode {:#X?} not implemented yet", opcode),
@@ -139,7 +141,8 @@ impl Cpu {
 
             (0x8, _, _, 0x6) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0x8, _, _, 0x7) => {
-                self.cpu_register[x as usize] = self.cpu_register[y as usize] - self.cpu_register[x as usize];
+                self.cpu_register[x as usize] =
+                    self.cpu_register[y as usize] - self.cpu_register[x as usize];
                 self.next_opcode()
             }
             (0x8, _, _, 0xE) => panic!("opcode {:#X?} not implemented yet", opcode),

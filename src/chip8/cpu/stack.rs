@@ -20,7 +20,6 @@ impl Stack {
         }
     }
 
-
     pub fn pop(&mut self) -> u16 {
         if self.stack_pointer > 0 {
             let ret = self.stack[self.stack_pointer as usize];
