@@ -5,3 +5,7 @@ authors = ["Benjamin Köhler <benjaminkoehler89@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+piston = "*"
+piston2d-graphics = "*"
+piston2d-opengl_graphics = "*"
+pistoncore-glutin_window = "*"

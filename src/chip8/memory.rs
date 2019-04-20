@@ -36,6 +36,10 @@ impl Memory {
         println!("Game loaded!")
     }
 
+    pub fn get_display_memory(&self) -> Vec<u8> {
+        vec![0; 1024]
+    }
+
     fn init_mem_with_fonts() -> Vec<u8> {
         let font: Vec<u8> = vec![
             0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
