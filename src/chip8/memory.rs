@@ -16,7 +16,7 @@ impl Memory {
         }
     }
 
-    pub fn put(mut self, position: u8, byte: u8) {
+    pub fn put(&mut self, position: u16, byte: u8) {
         self.mem[position as usize] = byte;
     }
 
@@ -38,6 +38,11 @@ impl Memory {
 
     pub fn get_display_memory(&self) -> Vec<u8> {
         vec![0; 1024]
+        //TODO implement
+    }
+
+    pub fn get_char_position(&self, char: u8) -> u16 {
+        (char as u16) + 0x50
     }
 
     fn init_mem_with_fonts() -> Vec<u8> {

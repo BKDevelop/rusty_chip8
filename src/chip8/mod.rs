@@ -139,7 +139,11 @@ impl Chip8 {
                     self.cpu_register[x as usize] & self.cpu_register[y as usize];
                 self.next_opcode()
             }
-            (0x8, _, _, 0x3) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0x8, _, _, 0x3) => {
+                self.cpu_register[x as usize] =
+                    self.cpu_register[x as usize] ^ self.cpu_register[y as usize];
+                self.next_opcode()
+            }
             (0x8, _, _, 0x4) => {
                 self.cpu_register[x as usize] += self.cpu_register[y as usize];
                 self.next_opcode()
@@ -182,24 +186,35 @@ impl Chip8 {
                 self.next_opcode()
             }
             (0xF, _, 0x1, 0xE) => {
-                self.program_counter += self.cpu_register[x as usize] as u16;
+                self.index_register += self.cpu_register[x as usize] as u16;
                 self.next_opcode()
             }
-            (0xF, _, 0x2, 0x9) => panic!("opcode {:#X?} not implemented yet", opcode),
-            (0xF, _, 0x3, 0x3) => panic!("opcode {:#X?} not implemented yet", opcode),
-            (0xF, _, 0x5, 0x5) => {
-                let mem_pos = x;
-                for byte in self.cpu_register {
-                    self.mem.put(mem_pos, byte);
-                    x += 1;
+            (0xF, _, 0x2, 0x9) => {
+                self.index_register = self.mem.get_char_position(self.cpu_register[x as usize]);
+                self.next_opcode()
+            }
+            (0xF, _, 0x3, 0x3) => {
+                let bcd = Chip8::get_bcd(self.cpu_register[x as usize]);
+                let mem_pos = self.index_register;
+                for i in 0..2 {
+                    self.mem.put(mem_pos + i, bcd[i as usize]);
                 }
                 self.next_opcode()
             }
+            (0xF, _, 0x5, 0x5) => {
+                let mem_pos = self.index_register;
+                let max_reg = x as u16;
+                for i in 0..max_reg {
+                    self.mem.put(mem_pos + i, self.cpu_register[i as usize]);
+                }
+
+                self.next_opcode()
+            }
             (0xF, _, 0x6, 0x5) => {
-                let mem_pos = x as u16;
-                for i in 0..15 {
-                    self.program_counter[i as usize] = self.mem.get(mem_pos);
-                    x += 1;
+                let mem_pos = self.index_register;
+                let max_reg = x as u16;
+                for i in 0..max_reg {
+                    self.cpu_register[i as usize] = self.mem.get(mem_pos + i);
                 }
                 self.next_opcode()
             }
@@ -214,5 +229,29 @@ impl Chip8 {
     fn skip_next_opcode(&self) -> u16 {
         self.next_opcode();
         self.next_opcode()
+    }
+
+    // binary coded decimal: 128 -> (1, 2, 8)
+    fn get_bcd(number: u8) -> [u8; 3] {
+        let hundreds = number / 100;
+
+        let stripped_hundreds = number % 100;
+        let tens = stripped_hundreds / 10;
+
+        let ones = stripped_hundreds % 10;
+
+        [hundreds, tens, ones]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_bcd() {
+        assert_eq!(Chip8::get_bcd(128), [1, 2, 8]);
+        assert_eq!(Chip8::get_bcd(28), [0, 2, 8]);
+        assert_eq!(Chip8::get_bcd(8), [0, 0, 8]);
     }
 }
