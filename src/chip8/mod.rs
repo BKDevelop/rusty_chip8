@@ -51,6 +51,11 @@ impl Chip8 {
         self.execute_opcode(opcode);
         // render display
         self.display.update_display(self.mem.get_display_memory());
+
+
+        //TODO limit execution rate to 1/second
+        self.delay_timer -= 1;
+        self.sound_timer -= 1;
     }
 
     fn read_opcode(&self) -> u16 {
@@ -145,21 +150,30 @@ impl Chip8 {
                 self.next_opcode()
             }
             (0x8, _, _, 0x4) => {
+                //TODO implement special case, carry flag (see opcode table)
                 self.cpu_register[x as usize] += self.cpu_register[y as usize];
                 self.next_opcode()
             }
             (0x8, _, _, 0x5) => {
+                //TODO implement special case, carry flag (see opcode table)
                 self.cpu_register[x as usize] -= self.cpu_register[y as usize];
                 self.next_opcode()
             }
 
-            (0x8, _, _, 0x6) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0x8, _, _, 0x6) => {
+                //TODO implement special case, carry flag (see opcode table)
+                panic!("opcode {:#X?} not implemented yet", opcode)
+            },
             (0x8, _, _, 0x7) => {
+                //TODO implement special case, carry flag (see opcode table)
                 self.cpu_register[x as usize] =
                     self.cpu_register[y as usize] - self.cpu_register[x as usize];
                 self.next_opcode()
             }
-            (0x8, _, _, 0xE) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0x8, _, _, 0xE) => {
+                //TODO implement special case, carry flag (see opcode table)
+                panic!("opcode {:#X?} not implemented yet", opcode)
+            }
             (0x9, _, _, 0x0) => {
                 if self.cpu_register[x as usize] != self.cpu_register[y as usize] {
                     self.skip_next_opcode()
@@ -173,7 +187,10 @@ impl Chip8 {
             }
             (0xB, _, _, _) => (self.cpu_register[0] as u16) + nnn,
             (0xC, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
-            (0xD, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
+            (0xD, _, _, _) => {
+                //TODO implement special case, carry flag (see opcode table)
+                panic!("opcode {:#X?} not implemented yet", opcode)
+            },
             (0xE, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0xF, _, 0x0, 0x7) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0xF, _, 0x0, 0xA) => panic!("opcode {:#X?} not implemented yet", opcode),

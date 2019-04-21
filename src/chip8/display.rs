@@ -17,7 +17,11 @@ impl Display {
         Display {}
     }
 
-    pub fn update_display(&self, display_memory: Vec<u8>) {}
+    pub fn update_display(&self, display_memory: Vec<u8>) {
+        panic!("method not implemented")
+    }
 
-    pub fn clear_display(&self) {}
+    pub fn clear_display(&self) {
+        panic!("method not implemented")
+    }
 }
