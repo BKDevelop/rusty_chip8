@@ -11,9 +11,9 @@
 //          -> delay timer
 //          -> sound timer
 
+mod display;
 mod memory;
 mod stack;
-mod display;
 
 pub struct Chip8 {
     mem: memory::Memory,
@@ -46,12 +46,17 @@ impl Chip8 {
         self.mem.load_game(game_rom);
     }
 
-    pub fn emulate_cycle(&mut self) {
+    pub fn start_emulation(&mut self) {
+        while let Some(e) = self.display.events.next(&mut self.display.window) {
+            self.emulate_cycle();
+        }
+
+    }
+    fn emulate_cycle(&mut self) {
         let opcode = self.read_opcode();
         self.execute_opcode(opcode);
         // render display
         self.display.update_display(self.mem.get_display_memory());
-
 
         //TODO limit execution rate to 1/second
         self.delay_timer -= 1;
@@ -74,7 +79,7 @@ impl Chip8 {
             ((opcode & 0xF000) >> 12) as u8,
             ((opcode & 0x0F00) >> 8) as u8,
             ((opcode & 0x00F0) >> 4) as u8,
-            ((opcode & 0x000F)) as u8,
+            (opcode & 0x000F) as u8,
         );
 
         // opcodes have some values that are often used
@@ -163,7 +168,7 @@ impl Chip8 {
             (0x8, _, _, 0x6) => {
                 //TODO implement special case, carry flag (see opcode table)
                 panic!("opcode {:#X?} not implemented yet", opcode)
-            },
+            }
             (0x8, _, _, 0x7) => {
                 //TODO implement special case, carry flag (see opcode table)
                 self.cpu_register[x as usize] =
@@ -190,7 +195,7 @@ impl Chip8 {
             (0xD, _, _, _) => {
                 //TODO implement special case, carry flag (see opcode table)
                 panic!("opcode {:#X?} not implemented yet", opcode)
-            },
+            }
             (0xE, _, _, _) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0xF, _, 0x0, 0x7) => panic!("opcode {:#X?} not implemented yet", opcode),
             (0xF, _, 0x0, 0xA) => panic!("opcode {:#X?} not implemented yet", opcode),
